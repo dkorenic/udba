@@ -1,0 +1,12 @@
+SET QUOTED_IDENTIFIER ON
+GO
+SET ANSI_NULLS ON
+GO
+
+
+CREATE VIEW [dbo].[FilteredServerPermissions]
+AS
+SELECT *
+FROM dbo.FilterServerPermissions(DEFAULT_DOMAIN(), @@SERVERNAME);
+
+GO

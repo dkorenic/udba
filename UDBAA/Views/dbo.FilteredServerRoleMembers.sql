@@ -1,0 +1,13 @@
+SET QUOTED_IDENTIFIER ON
+GO
+SET ANSI_NULLS ON
+GO
+
+
+
+CREATE VIEW [dbo].[FilteredServerRoleMembers]
+AS
+SELECT *
+FROM dbo.FilterServerRoleMembers(DEFAULT_DOMAIN(), @@SERVERNAME);
+
+GO
