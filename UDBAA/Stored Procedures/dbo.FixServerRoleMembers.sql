@@ -6,6 +6,7 @@ CREATE PROCEDURE [dbo].[FixServerRoleMembers]
     @debug tinyint = 0
   , @print tinyint = 0
   , @dryRun bit = 0
+  , @doRemove bit = 0
 AS
 SET NOCOUNT ON;
 
@@ -168,7 +169,13 @@ BEGIN
             PRINT @sql;
 
         IF @dryRun = 0
+           AND @doRemove = 1
+        BEGIN
+            PRINT CONCAT('EXEC: ', @sql);
             EXEC (@sql);
+        END;
+        ELSE
+            PRINT CONCAT('SKIP: ', @sql);
     END;
     ELSE IF @isActive = 1
             AND @countMembers = 0
@@ -184,6 +191,7 @@ BEGIN
     END;
 
 END;
+
 
 
 

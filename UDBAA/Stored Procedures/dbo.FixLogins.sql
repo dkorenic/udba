@@ -7,6 +7,7 @@ CREATE PROCEDURE [dbo].[FixLogins]
   , @types nvarchar(16) = 'SUG'
   , @createUnused bit = 1
   , @dropUnused bit = 0
+  , @doChangePassword bit = 0
   --
   , @debug tinyint = 0
   , @print tinyint = 0
@@ -299,10 +300,14 @@ BEGIN
         SET @sql = CONCAT('ALTER LOGIN ', QUOTENAME(@sLoginName), ' WITH PASSWORD = ', @sLoginPasswordHash, ' HASHED, CHECK_POLICY = OFF, CHECK_EXPIRATION = OFF;');
 
 
-        PRINT @sql;
-
         IF @dryRun = 0
+           AND @doChangePassword = 1
+        BEGIN
+            PRINT CONCAT('EXEC: ', @sql);
             EXEC (@sql);
+        END;
+        ELSE
+            PRINT CONCAT('SKIP: ', @sql);
     END;
     ELSE
     -- inače odjeb
@@ -312,6 +317,7 @@ BEGIN
 
     PRINT '';
 END;
+
 
 
 GO
