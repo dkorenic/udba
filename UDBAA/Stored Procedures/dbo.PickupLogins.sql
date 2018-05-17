@@ -14,6 +14,9 @@ CREATE PROCEDURE [dbo].[PickupLogins]
 AS
 SET NOCOUNT ON;
 
+DECLARE @ctx varbinary(128) = CAST(OBJECT_NAME(@@PROCID) AS varbinary(128));
+SET CONTEXT_INFO @ctx;
+
 WITH s AS (
     SELECT DEFAULT_DOMAIN()                                                                  AS DomainName
          , @@SERVERNAME                                                                      AS ServerName
@@ -156,9 +159,7 @@ BEGIN
               -- password different and older than in config
               OR
               (
-                  
-                      s.LoginPasswordHash != d.LoginPasswordHash
-                  
+                  s.LoginPasswordHash != d.LoginPasswordHash
                   AND
                   (
                       d.LoginPasswordLastSetTimeUtc < s.LoginPasswordLastSetTimeUtc
@@ -232,9 +233,7 @@ BEGIN
     ELSE
     -- noviji password na stroju
     IF @sLoginPasswordLastSetTimeUtc > @dLoginPasswordLastSetTimeUtc
-       AND
-       
-           @sLoginPasswordHash != @dLoginPasswordHash
+       AND @sLoginPasswordHash != @dLoginPasswordHash
     BEGIN
         PRINT CONCAT('Updating to ', QUOTENAME(@sLoginName), ' to new password.');
 

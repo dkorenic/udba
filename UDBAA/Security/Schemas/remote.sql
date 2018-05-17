@@ -1,0 +1,3 @@
+CREATE SCHEMA [remote]
+AUTHORIZATION [dbo]
+GO

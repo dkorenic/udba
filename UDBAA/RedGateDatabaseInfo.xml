@@ -58,7 +58,7 @@
     <DataWriteAllFilesInOneDirectory>True</DataWriteAllFilesInOneDirectory>
   </WriteToFileOptions>
   <DataFileSet>
-    <Count>7</Count>
+    <Count>8</Count>
     <DataFile>dbo.DatabaseTypes_Data.sql</DataFile>
     <DataFile>dbo.Logins_Data.sql</DataFile>
     <DataFile>dbo.ServerPermissions_Data.sql</DataFile>
@@ -66,5 +66,6 @@
     <DataFile>dbo.ServerRoles_Data.sql</DataFile>
     <DataFile>dbo.Databases_Data.sql</DataFile>
     <DataFile>dbo.DatabaseUsers_Data.sql</DataFile>
+    <DataFile>dbo.Log_Data.sql</DataFile>
   </DataFileSet>
 </DatabaseInformation>

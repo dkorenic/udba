@@ -12,7 +12,8 @@ RETURNS table
 AS
 RETURN
 (
-    SELECT DomainName
+    SELECT RowId
+         , DomainName
          , ServerName
          , Persona
          , LoginName
@@ -32,4 +33,5 @@ RETURN
           AND DomainName IN ( '', @domainName )
           AND ServerName IN ( '', @serverName )
 );
+
 GO

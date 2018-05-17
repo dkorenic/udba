@@ -7,6 +7,7 @@ CREATE PROCEDURE [dbo].[FixLogins]
   , @types nvarchar(16) = 'SUG'
   , @createUnused bit = 1
   , @dropUnused bit = 0
+  , @doDrop bit = 0
   , @doChangePassword bit = 0
   --
   , @debug tinyint = 0
@@ -14,6 +15,8 @@ CREATE PROCEDURE [dbo].[FixLogins]
   , @dryRun bit = 0
 AS
 SET NOCOUNT ON;
+
+DECLARE @error nvarchar(MAX);
 
 WITH s AS (
     SELECT DEFAULT_DOMAIN()                                                                  AS DomainName
@@ -250,7 +253,29 @@ BEGIN
         PRINT @sql;
 
         IF @dryRun = 0
-            EXEC (@sql);
+        BEGIN
+            PRINT CONCAT('EXEC: ', @sql);
+            BEGIN TRY
+                EXEC (@sql);
+                SET @error = '';
+            END TRY
+            BEGIN CATCH
+                SET @error = ERROR_MESSAGE();
+                THROW;
+            END CATCH;
+            INSERT INTO dbo.Log
+            (
+                DomainName
+              , ServerName
+              , RecordRowGuid
+              , StoredProcedure
+              , Operation
+              , Description
+              , Error
+            )
+            VALUES
+            (DEFAULT_DOMAIN(), @@SERVERNAME, NULL, OBJECT_NAME(@@PROCID), N'CREATE LOGIN', @sql, @error);
+        END;
     END;
     ELSE
     -- višak - DROP
@@ -267,28 +292,33 @@ BEGIN
     BEGIN
         SET @sql = CONCAT('DROP LOGIN ', QUOTENAME(@sLoginName), ';');
 
-        PRINT @sql;
-
         IF @dryRun = 0
-        BEGIN TRY
-            EXEC (@sql);
-        END TRY
-        BEGIN CATCH
-            INSERT INTO dbo.Log
+           AND @doDrop = 1
+        BEGIN
+            PRINT CONCAT('EXEC: ', @sql);
+            BEGIN TRY
+                EXEC (@sql);
+                SET @error = '';
+            END TRY
+            BEGIN CATCH
+                SET @error = ERROR_MESSAGE();
+                THROW;
+            END CATCH;
+            INSERT INTO dbo.LOG
             (
                 DomainName
               , ServerName
               , RecordRowGuid
               , StoredProcedure
               , Operation
-              , Description
-              , Error
+              , DESCRIPTION
+              , ERROR
             )
             VALUES
-            (DEFAULT_DOMAIN(), @@SERVERNAME, NULL, OBJECT_NAME(@@PROCID), N'DROP LOGIN', @sql, ERROR_MESSAGE());
-
-            THROW;
-        END CATCH;
+            (DEFAULT_DOMAIN(), @@SERVERNAME, NULL, OBJECT_NAME(@@PROCID), N'DROP LOGIN', @sql, @error);
+        END;
+        ELSE
+            PRINT CONCAT('SKIP: ', @sql);
     END;
     ELSE
     -- noviji password - ALTER
@@ -304,7 +334,26 @@ BEGIN
            AND @doChangePassword = 1
         BEGIN
             PRINT CONCAT('EXEC: ', @sql);
-            EXEC (@sql);
+            BEGIN TRY
+                EXEC (@sql);
+                SET @error = '';
+            END TRY
+            BEGIN CATCH
+                SET @error = ERROR_MESSAGE();
+                THROW;
+            END CATCH;
+            INSERT INTO dbo.LOG
+            (
+                DomainName
+              , ServerName
+              , RecordRowGuid
+              , StoredProcedure
+              , Operation
+              , DESCRIPTION
+              , ERROR
+            )
+            VALUES
+            (DEFAULT_DOMAIN(), @@SERVERNAME, NULL, OBJECT_NAME(@@PROCID), N'ALTER LOGIN', @sql, @error);
         END;
         ELSE
             PRINT CONCAT('SKIP: ', @sql);
@@ -317,6 +366,7 @@ BEGIN
 
     PRINT '';
 END;
+
 
 
 
