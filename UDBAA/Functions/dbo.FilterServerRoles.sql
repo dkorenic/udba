@@ -11,7 +11,8 @@ RETURNS table
 AS
 RETURN
 (
-    SELECT DomainName
+    SELECT RowId
+         , DomainName
          , RoleName
          , IsActive
          , DENSE_RANK() OVER (PARTITION BY RoleName

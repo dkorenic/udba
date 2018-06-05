@@ -3,7 +3,7 @@ GO
 SET ANSI_NULLS ON
 GO
 
-CREATE PROCEDURE [sync].[GetLoginsFromServer]
+CREATE PROCEDURE [sync].[GetServerPermissionsFromServer]
     @serverName nvarchar(64)
   , @print tinyint = 0
 AS
@@ -33,8 +33,8 @@ BEGIN
     SET @sql = '
 IF SCHEMA_ID(''tmp'') IS NULL EXEC(''CREATE SCHEMA [tmp]'');
 
-IF OBJECT_ID(''[tmp].[dbo.Logins]'') IS NOT NULL EXEC(''DROP TABLE [tmp].[dbo.Logins]'');
-SELECT TOP (0) * INTO [tmp].[dbo.Logins] FROM dbo.Logins;
+IF OBJECT_ID(''[tmp].[dbo.ServerPermissions]'') IS NOT NULL EXEC(''DROP TABLE [tmp].[dbo.ServerPermissions]'');
+SELECT TOP (0) * INTO [tmp].[dbo.ServerPermissions] FROM dbo.ServerPermissions;
 
 SET @domain = DEFAULT_DOMAIN();
 '   ;
@@ -46,12 +46,12 @@ SET @domain = DEFAULT_DOMAIN();
         PRINT CONCAT('@domain: ', @domain);
 
     /* get remote data */
-    DELETE FROM remote.Logins
+    DELETE FROM remote.ServerPermissions
     WHERE RemoteDomainName = @domain
           AND RemoteServerName = @serverName;
 
-    SET @sql = 'SELECT DEFAULT_DOMAIN(), @@SERVERNAME, * FROM dbo.Logins';
-    INSERT remote.Logins
+    SET @sql = 'SELECT DEFAULT_DOMAIN(), @@SERVERNAME, * FROM dbo.ServerPermissions';
+    INSERT remote.ServerPermissions
     EXEC @proc @sql;
     SET @rc = @@ROWCOUNT;
     IF @print > 0
@@ -63,22 +63,18 @@ SET @domain = DEFAULT_DOMAIN();
              , DomainName
              , ServerName
              , Persona
-             , LoginName
-             , LoginSystemType
-             , LoginSID
-             , LoginPasswordHash
+             , Permission
              , IsActive
-             , LoginPasswordLastSetTimeUtc
-        FROM remote.Logins
+        FROM remote.ServerPermissions
         WHERE RemoteDomainName = @domain
               AND RemoteServerName = @serverName
               AND DomainName = @domain
               AND ServerName = @serverName
     )
-    INSERT INTO dbo.Logins
+    INSERT INTO dbo.ServerPermissions
     SELECT r.*
     FROM r
-        LEFT JOIN dbo.Logins AS c
+        LEFT JOIN dbo.ServerPermissions AS c
             ON c.RowId = r.RowId
                -- join by PK is here to resolve duplicates
                OR
@@ -86,33 +82,13 @@ SET @domain = DEFAULT_DOMAIN();
                    c.DomainName = r.DomainName
                    AND c.ServerName = r.ServerName
                    AND c.Persona = r.Persona
-                   AND c.LoginName = r.LoginName
+                   AND c.Permission = r.Permission
                )
     WHERE c.RowId IS NULL;
     SET @rc = @@ROWCOUNT;
 
     IF @print > 0
         PRINT CONCAT('new records: ', @rc);
-
-    /* persist pasword changes */
-    WITH r AS (
-        SELECT *
-        FROM remote.Logins
-        WHERE RemoteDomainName = @domain
-              AND RemoteServerName = @serverName
-    )
-    UPDATE c
-    SET c.LoginPasswordHash = r.LoginPasswordHash
-      , c.LoginPasswordLastSetTimeUtc = r.LoginPasswordLastSetTimeUtc
-    FROM r
-        JOIN dbo.Logins AS c
-            ON c.RowId = r.RowId
-    WHERE r.LoginPasswordHash != c.LoginPasswordHash
-          AND r.LoginPasswordLastSetTimeUtc > c.LoginPasswordLastSetTimeUtc;
-    SET @rc = @@ROWCOUNT;
-
-    IF @print > 0
-        PRINT CONCAT('new passwords: ', @rc);
 
 END;
 

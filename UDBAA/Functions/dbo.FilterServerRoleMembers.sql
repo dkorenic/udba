@@ -12,7 +12,8 @@ RETURNS table
 AS
 RETURN
 (
-        SELECT DomainName
+        SELECT RowId
+         , DomainName
          , ServerName
          , RoleName
          , Persona
@@ -26,7 +27,7 @@ RETURN
          , DENSE_RANK() OVER (ORDER BY RoleName, Persona) AS PriorityGroup
     FROM dbo.ServerRoleMembers
     WHERE 1 = 1
-          AND DomainName IN ( '', DEFAULT_DOMAIN())
-          AND ServerName IN ( '', @@SERVERNAME )
+          AND DomainName IN ( '', @domainName)
+          AND ServerName IN ( '', @serverName )
 );
 GO

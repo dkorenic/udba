@@ -12,7 +12,8 @@ RETURNS table
 AS
 RETURN
 (
-    SELECT DomainName
+    SELECT RowId
+         , DomainName
          , ServerName
          , Persona
          , Permission
@@ -26,7 +27,8 @@ RETURN
          , DENSE_RANK() OVER (ORDER BY Persona, Permission) AS PriorityGroup
     FROM dbo.ServerPermissions
     WHERE 1 = 1
-          AND DomainName IN ( '', DEFAULT_DOMAIN())
-          AND ServerName IN ( '', @@SERVERNAME )
+          AND DomainName IN ( '', @domainName )
+          AND ServerName IN ( '', @serverName )
 );
+
 GO

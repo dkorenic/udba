@@ -188,7 +188,10 @@ BEGIN
                       s.IsActive = 1
                       AND
                       (
-                          d.LoginPasswordLastSetTimeUtc < s.LoginPasswordLastSetTimeUtc
+                          (
+                              d.LoginPasswordLastSetTimeUtc < s.LoginPasswordLastSetTimeUtc
+                              AND d.LoginPasswordHash != s.LoginPasswordHash
+                          )
                           OR
                           (
                               d.LoginSystemType = 'S'

@@ -1,14 +1,15 @@
 CREATE TABLE [dbo].[Log]
 (
 [InsertedAt] [datetime2] NOT NULL CONSTRAINT [DF_Log_InsertedAt] DEFAULT (getutcdate()),
-[DomainName] [nvarchar] (64) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL,
-[ServerName] [nvarchar] (64) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL,
+[DomainName] [nvarchar] (64) NOT NULL,
+[ServerName] [nvarchar] (64) NOT NULL,
+[RowGuid] [uniqueidentifier] NOT NULL ROWGUIDCOL CONSTRAINT [DF_Log_RowGuid] DEFAULT (newid()),
 [RecordRowGuid] [uniqueidentifier] NULL,
-[StoredProcedure] [nvarchar] (max) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
-[Operation] [nvarchar] (max) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
-[Description] [nvarchar] (max) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
-[Error] [nvarchar] (max) COLLATE SQL_Latin1_General_CP1_CI_AS NULL
-) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
+[StoredProcedure] [nvarchar] (max) NULL,
+[Operation] [nvarchar] (max) NULL,
+[Description] [nvarchar] (max) NULL,
+[Error] [nvarchar] (max) NULL
+) ON [PRIMARY]
 GO
-ALTER TABLE [dbo].[Log] ADD CONSTRAINT [PK_Log] PRIMARY KEY CLUSTERED  ([InsertedAt], [DomainName], [ServerName]) ON [PRIMARY]
+ALTER TABLE [dbo].[Log] ADD CONSTRAINT [PK_Log_1] PRIMARY KEY CLUSTERED  ([InsertedAt], [DomainName], [ServerName], [RowGuid]) ON [PRIMARY]
 GO
