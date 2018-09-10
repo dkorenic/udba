@@ -54,7 +54,7 @@ SET @domain = DEFAULT_DOMAIN();
         PRINT CONCAT('@domain: ', @domain);
 
     /* push filtered ServerPermissions */
-    SET @sql = CONCAT('INSERT INTO ', QUOTENAME(@serverName), '.', QUOTENAME(DB_NAME()), '.[tmp].[dbo.ServerPermissions] SELECT * FROM dbo.ServerPermissions WHERE t.RowId IN (SELECT RowId FROM dbo.FilterServerPermissions(@domain, @serverName) t); SET @rc = @@ROWCOUNT;');
+    SET @sql = CONCAT('INSERT INTO ', QUOTENAME(@serverName), '.', QUOTENAME(DB_NAME()), '.[tmp].[dbo.ServerPermissions] SELECT * FROM dbo.ServerPermissions t WHERE t.RowId IN (SELECT RowId FROM dbo.FilterServerPermissions(@domain, @serverName) t); SET @rc = @@ROWCOUNT;');
     IF @print > 1
         PRINT @sql;
     IF @dryRun = 0
@@ -133,6 +133,7 @@ SET @domain = DEFAULT_DOMAIN();
 		END
 	END
 END;
+
 
 
 GO
