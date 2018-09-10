@@ -253,7 +253,7 @@ BEGIN
         ELSE
             SET @sql = CONCAT('CREATE LOGIN ', QUOTENAME(@sLoginName), ' FROM WINDOWS;');
 
-        PRINT @sql;
+        --PRINT @sql;
 
         IF @dryRun = 0
         BEGIN
@@ -279,6 +279,8 @@ BEGIN
             VALUES
             (DEFAULT_DOMAIN(), @@SERVERNAME, NULL, OBJECT_NAME(@@PROCID), N'CREATE LOGIN', @sql, @error);
         END;
+        ELSE
+            PRINT @sql;
     END;
     ELSE
     -- višak - DROP
@@ -295,8 +297,10 @@ BEGIN
     BEGIN
         SET @sql = CONCAT('DROP LOGIN ', QUOTENAME(@sLoginName), ';');
 
-        IF @dryRun = 0
-           AND @doDrop = 1
+        IF ISNULL(@doDrop, 0) = 0
+            PRINT CONCAT('SKIP: ', @sql);
+        ELSE IF @dryRun = 0
+                AND @doDrop = 1
         BEGIN
             PRINT CONCAT('EXEC: ', @sql);
             BEGIN TRY
@@ -321,7 +325,7 @@ BEGIN
             (DEFAULT_DOMAIN(), @@SERVERNAME, NULL, OBJECT_NAME(@@PROCID), N'DROP LOGIN', @sql, @error);
         END;
         ELSE
-            PRINT CONCAT('SKIP: ', @sql);
+            PRINT @sql;
     END;
     ELSE
     -- noviji password - ALTER
@@ -332,9 +336,10 @@ BEGIN
     BEGIN
         SET @sql = CONCAT('ALTER LOGIN ', QUOTENAME(@sLoginName), ' WITH PASSWORD = ', @sLoginPasswordHash, ' HASHED, CHECK_POLICY = OFF, CHECK_EXPIRATION = OFF;');
 
-
-        IF @dryRun = 0
-           AND @doChangePassword = 1
+        IF ISNULL(@doChangePassword, 0) = 0
+            PRINT CONCAT('SKIP: ', @sql);
+        ELSE IF @dryRun = 0
+                AND @doChangePassword = 1
         BEGIN
             PRINT CONCAT('EXEC: ', @sql);
             BEGIN TRY
@@ -359,7 +364,7 @@ BEGIN
             (DEFAULT_DOMAIN(), @@SERVERNAME, NULL, OBJECT_NAME(@@PROCID), N'ALTER LOGIN', @sql, @error);
         END;
         ELSE
-            PRINT CONCAT('SKIP: ', @sql);
+            PRINT @sql;
     END;
     ELSE
     -- inače odjeb
@@ -369,6 +374,7 @@ BEGIN
 
     PRINT '';
 END;
+
 
 
 

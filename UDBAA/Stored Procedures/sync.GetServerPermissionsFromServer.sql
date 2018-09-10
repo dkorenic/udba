@@ -63,7 +63,9 @@ SET @domain = DEFAULT_DOMAIN();
              , DomainName
              , ServerName
              , Persona
+             , State
              , Permission
+             , Target
              , IsActive
         FROM remote.ServerPermissions
         WHERE RemoteDomainName = @domain
@@ -82,7 +84,9 @@ SET @domain = DEFAULT_DOMAIN();
                    c.DomainName = r.DomainName
                    AND c.ServerName = r.ServerName
                    AND c.Persona = r.Persona
+                   AND c.State = r.State
                    AND c.Permission = r.Permission
+                   AND c.Target = r.Target
                )
     WHERE c.RowId IS NULL;
     SET @rc = @@ROWCOUNT;

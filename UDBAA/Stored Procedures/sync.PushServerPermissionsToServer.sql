@@ -54,7 +54,7 @@ SET @domain = DEFAULT_DOMAIN();
         PRINT CONCAT('@domain: ', @domain);
 
     /* push filtered ServerPermissions */
-    SET @sql = CONCAT('INSERT INTO ', QUOTENAME(@serverName), '.', QUOTENAME(DB_NAME()), '.[tmp].[dbo.ServerPermissions] SELECT * FROM dbo.ServerPermissions WHERE RowId IN (SELECT RowId FROM dbo.FilterServerPermissions(@domain, @serverName)); SET @rc = @@ROWCOUNT;');
+    SET @sql = CONCAT('INSERT INTO ', QUOTENAME(@serverName), '.', QUOTENAME(DB_NAME()), '.[tmp].[dbo.ServerPermissions] SELECT * FROM dbo.ServerPermissions WHERE t.RowId IN (SELECT RowId FROM dbo.FilterServerPermissions(@domain, @serverName) t); SET @rc = @@ROWCOUNT;');
     IF @print > 1
         PRINT @sql;
     IF @dryRun = 0
@@ -85,15 +85,17 @@ SET @domain = DEFAULT_DOMAIN();
     USING s
     ON d.RowId = s.RowId
     WHEN NOT MATCHED BY TARGET THEN
-        INSERT (RowId, DomainName, ServerName, Persona, Permission, IsActive) VALUES
-               (s.RowId, s.DomainName, s.ServerName, s.Persona, s.Permission, s.IsActive)
+        INSERT (RowId, DomainName, ServerName, Persona, State, Permission, Target, IsActive) VALUES
+               (s.RowId, s.DomainName, s.ServerName, s.Persona, s.State, s.Permission, s.Target, s.IsActive)
     WHEN MATCHED AND d._chk != s._chk THEN
         UPDATE SET d.DomainName = s.DomainName
                  , d.ServerName = s.ServerName
 
                  , d.Persona = s.Persona
 
+				 , d.State = s.State
                  , d.Permission = s.Permission
+				 , d.Target = s.Target
 
                  , d.IsActive = s.IsActive
     WHEN NOT MATCHED BY SOURCE THEN DELETE

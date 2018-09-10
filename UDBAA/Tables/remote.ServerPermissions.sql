@@ -6,9 +6,11 @@ CREATE TABLE [remote].[ServerPermissions]
 [DomainName] [nvarchar] (64) NOT NULL,
 [ServerName] [nvarchar] (64) NOT NULL,
 [Persona] [nvarchar] (64) NOT NULL,
+[State] [char] (1) NOT NULL,
 [Permission] [nvarchar] (64) NOT NULL,
+[Target] [nvarchar] (64) NOT NULL,
 [IsActive] [bit] NULL
 ) ON [PRIMARY]
 GO
-ALTER TABLE [remote].[ServerPermissions] ADD CONSTRAINT [PK_ServerPermissions] PRIMARY KEY CLUSTERED  ([RemoteDomainName], [RemoteServerName], [DomainName], [ServerName], [Persona], [Permission]) ON [PRIMARY]
+ALTER TABLE [remote].[ServerPermissions] ADD CONSTRAINT [PK_ServerPermissions] PRIMARY KEY CLUSTERED  ([RemoteDomainName], [RemoteServerName], [DomainName], [ServerName], [Persona], [State], [Permission], [Target]) ON [PRIMARY]
 GO
