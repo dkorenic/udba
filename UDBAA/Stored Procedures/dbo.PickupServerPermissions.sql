@@ -56,7 +56,7 @@ WITH l AS (
          --
          , COALESCE(l.Persona, r.RoleName) AS Persona
     FROM sys.server_permissions    AS sp
-        JOIN sys.server_principals AS p
+        JOIN dbo.InterestingServerPrincipals AS p
             ON p.principal_id = sp.grantee_principal_id
         LEFT JOIN l
             ON l.LoginName = p.name
@@ -65,30 +65,7 @@ WITH l AS (
     WHERE 1 = 1
           AND COALESCE(l.Persona, r.RoleName) IS NOT NULL
           AND 'RSUG' LIKE CONCAT('%', p.type, '%')
-          --AND p.NAME LIKE @loginLike
-          --AND p.is_disabled = 0
-          AND LEN(p.sid) > 1
-          AND p.name NOT LIKE '##MS%'
-          AND
-          (
-              p.name NOT LIKE 'NT SERVICE\%'
-              OR p.type NOT IN ( 'U', 'G' )
-          )
-          AND
-          (
-              p.name NOT LIKE 'NT AUTHORITY\%'
-              OR p.type NOT IN ( 'U', 'G' )
-          )
-          --AND
-          --(
-          --    p.NAME LIKE (DEFAULT_DOMAIN() + '\%')
-          --    OR p.TYPE NOT IN ( 'U', 'G' )
-          --)
-          AND
-          (
-              p.name != 'distributor_admin'
-              OR p.type NOT IN ( 'S' )
-          )
+		  AND sp.permission_name NOT IN ('CONNECT SQL')
 )
 SELECT DEFAULT_DOMAIN()                              AS DomainName
      , @@SERVERNAME                                  AS ServerName
