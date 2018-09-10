@@ -1,7 +1,0 @@
-INSERT INTO [dbo].[ServerPermissions] ([RowId], [DomainName], [ServerName], [Persona], [Permission], [IsActive]) VALUES ('020e944c-8676-4288-b3b9-049fdeab2adf', N'HTKES', N'', N'dkorenic', N'ALTER TRACE', 0)
-INSERT INTO [dbo].[ServerPermissions] ([RowId], [DomainName], [ServerName], [Persona], [Permission], [IsActive]) VALUES ('a2776769-7cde-4c60-850f-20fea94e3cf5', N'', N'', N'jebaci', N'CONNECT SQL', 1)
-INSERT INTO [dbo].[ServerPermissions] ([RowId], [DomainName], [ServerName], [Persona], [Permission], [IsActive]) VALUES ('470879c8-4a79-45f7-969b-2264ca21ebc1', N'HATTRICK', N'', N'dkorenic', N'ALTER TRACE', 0)
-INSERT INTO [dbo].[ServerPermissions] ([RowId], [DomainName], [ServerName], [Persona], [Permission], [IsActive]) VALUES ('35493201-e25d-40a6-bba4-3908daa9c1dc', N'', N'', N'monitor', N'ALTER TRACE', 1)
-INSERT INTO [dbo].[ServerPermissions] ([RowId], [DomainName], [ServerName], [Persona], [Permission], [IsActive]) VALUES ('b9083188-941e-405c-98ec-4519d61adfa0', N'', N'', N'monitor', N'VIEW SERVER STATE', 1)
-INSERT INTO [dbo].[ServerPermissions] ([RowId], [DomainName], [ServerName], [Persona], [Permission], [IsActive]) VALUES ('793d62dd-db20-423d-8eff-9830a3f362f1', N'', N'', N'mbacicek', N'CONNECT SQL', 1)
-INSERT INTO [dbo].[ServerPermissions] ([RowId], [DomainName], [ServerName], [Persona], [Permission], [IsActive]) VALUES ('a5931b2e-e750-433a-bf88-e44854b7b2ec', N'', N'', N'dkorenic', N'ALTER TRACE', 1)
