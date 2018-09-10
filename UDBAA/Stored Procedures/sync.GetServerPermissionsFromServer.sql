@@ -50,12 +50,26 @@ SET @domain = DEFAULT_DOMAIN();
     WHERE RemoteDomainName = @domain
           AND RemoteServerName = @serverName;
 
-    SET @sql = 'SELECT DEFAULT_DOMAIN(), @@SERVERNAME, * FROM dbo.ServerPermissions';
+    SET @sql = 'SELECT DEFAULT_DOMAIN(), @@SERVERNAME, [RowId], [DomainName], [ServerName], [Persona], [Permission], [Target], [State], [IsActive] FROM dbo.ServerPermissions';
     INSERT remote.ServerPermissions
+    (
+        RemoteDomainName
+      , RemoteServerName
+      , RowId
+      , DomainName
+      , ServerName
+      , Persona
+      , Permission
+      , Target
+      , State
+      , IsActive
+    )
     EXEC @proc @sql;
     SET @rc = @@ROWCOUNT;
     IF @print > 0
         PRINT CONCAT('get records: ', @rc);
+
+    --RETURN;
 
     /* persist new records */
     WITH r AS (
@@ -63,9 +77,9 @@ SET @domain = DEFAULT_DOMAIN();
              , DomainName
              , ServerName
              , Persona
-             , State
              , Permission
              , Target
+             , State
              , IsActive
         FROM remote.ServerPermissions
         WHERE RemoteDomainName = @domain
@@ -73,7 +87,7 @@ SET @domain = DEFAULT_DOMAIN();
               AND DomainName = @domain
               AND ServerName = @serverName
     )
-    INSERT INTO dbo.ServerPermissions
+    INSERT INTO dbo.ServerPermissions ([RowId], [DomainName], [ServerName], [Persona], [Permission], [Target], [State], [IsActive])
     SELECT r.*
     FROM r
         LEFT JOIN dbo.ServerPermissions AS c
@@ -95,5 +109,6 @@ SET @domain = DEFAULT_DOMAIN();
         PRINT CONCAT('new records: ', @rc);
 
 END;
+
 
 GO

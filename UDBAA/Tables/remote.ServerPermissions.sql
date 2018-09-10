@@ -6,9 +6,9 @@ CREATE TABLE [remote].[ServerPermissions]
 [DomainName] [nvarchar] (64) NOT NULL,
 [ServerName] [nvarchar] (64) NOT NULL,
 [Persona] [nvarchar] (64) NOT NULL,
-[State] [char] (1) NOT NULL,
 [Permission] [nvarchar] (64) NOT NULL,
 [Target] [nvarchar] (64) NOT NULL,
+[State] [char] (1) NOT NULL,
 [IsActive] [bit] NULL
 ) ON [PRIMARY]
 GO
